@@ -1,3 +1,5 @@
+#:schema https://json.schemastore.org/pyproject.json
+
 [project]
 name = "rapidocr-service"
 version = "0.1.0"
@@ -9,21 +11,17 @@ authors = [{ name = "Your Name", email = "you@example.com" }]
 keywords = ["ocr", "rapidocr", "onnx", "document-parsing"]
 
 dependencies = [
-    "fastapi>=0.115.0",
-    "uvicorn[standard]>=0.32.0",
+    "fastapi>=0.123.0",
+    "uvicorn>=0.38.0",
     "python-multipart>=0.0.12",
-    "pillow>=10.4.0",
+    "pillow>=12.0.0",
     "rapidocr-onnxruntime>=1.4.4",
-    "rapidocr-pdf>=0.4.0",
+    "pymupdf>=1.26.0",
+    "alive-progress>=3.3.0",
 ]
 
-[project.optional-dependencies]
-dev = [
-    "ruff>=0.8.0",
-    "pytest>=8.3.0",
-    "pytest-asyncio>=0.24.0",
-    "httpx>=0.27.0",
-]
+[project.scripts]
+ocr = "rapidocr_service.cli:main"
 
 [build-system]
 requires = ["hatchling"]
@@ -31,10 +29,10 @@ build-backend = "hatchling.build"
 
 [dependency-groups]
 dev = [
-    "ruff>=0.8.0",
-    "pytest>=8.3.0",
-    "pytest-asyncio>=0.24.0",
-    "httpx>=0.27.0",
+    "ruff>=0.14.0",
+    "pytest>=9.0.0",
+    "pytest-asyncio>=1.3.0",
+    "httpx>=0.28.0",
     "ty>=0.0.1a30",
 ]
 
@@ -56,11 +54,33 @@ select = [
     "TCH",    # flake8-type-checking
     "PTH",    # flake8-use-pathlib
     "RUF",    # ruff-specific rules
+    "S",      # flake8-bandit (security)
+    "A",      # flake8-builtins (shadowing builtins)
+    "T10",    # flake8-debugger (leftover debugger)
+    "T20",    # flake8-print (leftover prints)
+    "PIE",    # flake8-pie (misc lints)
+    "PGH",    # pygrep-hooks
+    "RET",    # flake8-return
+    "PERF",   # perflint (performance)
+    "FURB",   # refurb (modern python)
+    "LOG",    # flake8-logging
+    "ASYNC",  # flake8-async (important for FastAPI)
+    "N",      # pep8-naming
+    "PL",     # pylint (PLC, PLE, PLR, PLW)
+    "ERA",    # eradicate (commented-out code)
 ]
 ignore = [
     "E501",   # line too long (handled by formatter)
-    "B008",   # do not perform function calls in argument defaults
+    "B008",   # function calls in defaults (FastAPI Depends)
+    "S104",   # binding to all interfaces (containers)
+    "RET504", # unnecessary assignment before return
+    "PLR0913", # too many arguments
+    "PLR2004", # magic value comparison
 ]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = ["S101", "ARG001", "PLR2004", "PLC0415"]
+"**/cli.py" = ["T201", "PLR0912", "PERF402"]  # CLI needs print, has complex logic, and manual append for progress
 
 [tool.ruff.lint.isort]
 known-first-party = ["rapidocr_service"]

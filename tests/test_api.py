@@ -26,7 +26,7 @@ def mock_model():
 
 
 @pytest.fixture
-def client(mock_model):  # noqa: ARG001
+def client(mock_model):
     """Create a test client."""
     from rapidocr_service.server import app
 
